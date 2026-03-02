@@ -1,11 +1,11 @@
 # optic-lens 光学透镜滤镜
 
-[English](README.md) | 中文
+[English](README.md) | [中文](README.zh-CN.md)
 
 [![npm version](https://img.shields.io/npm/v/optic-lens.svg)](https://www.npmjs.com/package/optic-lens)
 
 <p align="center">
-  <img src="./logo/logo.svg" alt="optic-lens logo"/>
+  <img src="./doc/logo.svg" alt="optic-lens logo"/>
 </p>
 
 为前端提供光学透镜风味滤镜效果。支持多种滤镜如液态玻璃、鱼眼、放大镜等。
@@ -15,6 +15,7 @@
 支持自定义尺寸、曲率、圆角、边缘柔化、色散、调试模式和拖拽等多种参数。
 
 **在线演示：** [http://optic.play.kt.sb/](http://optic.play.kt.sb/)
+![demo](./doc/Snipaste_2026-03-03_01-21-07.png)
 
 ## 支持的滤镜
 
