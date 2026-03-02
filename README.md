@@ -1,9 +1,11 @@
 # optic-lens — Optical Lens Filters
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 [![npm version](https://img.shields.io/npm/v/optic-lens.svg)](https://www.npmjs.com/package/optic-lens)
 
 <p align="center">
-  <img src="./logo/logo.svg" alt="optic-lens logo"/>
+  <img src="./doc/logo.svg" alt="optic-lens logo"/>
 </p>
 
 Optical lens-style filter effects for the frontend. Supports multiple filters such as liquid glass, fisheye, magnifier, and more.
@@ -12,6 +14,8 @@ You can generate filter effects standalone, apply them to page elements, or crea
 
 Supports customizable size, curvature, border radius, edge softening, chromatic aberration, debug mode, and drag-and-drop.
 
+**Demo:** [http://optic.play.kt.sb/](http://optic.play.kt.sb/)
+![demo](./doc/Snipaste_2026-03-03_01-21-07.png)
 ## Supported Filters
 
 TODO: Some filters are not fully implemented yet; see the demo for parameter effects vs. actual results.
