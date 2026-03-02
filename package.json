@@ -1,0 +1,95 @@
+{
+  "name": "optic-lens",
+  "version": "0.1.0",
+  "description": "A collection of lens effect filters for web applications",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./glass": {
+      "types": "./dist/lenses/glass.d.ts",
+      "import": "./dist/lenses/glass.js"
+    },
+    "./fisheye": {
+      "types": "./dist/lenses/fisheye.d.ts",
+      "import": "./dist/lenses/fisheye.js"
+    },
+    "./kaleidoscope": {
+      "types": "./dist/lenses/kaleidoscope.d.ts",
+      "import": "./dist/lenses/kaleidoscope.js"
+    },
+    "./readingGlass": {
+      "types": "./dist/lenses/readingGlass.d.ts",
+      "import": "./dist/lenses/readingGlass.js"
+    },
+    "./cylindrical": {
+      "types": "./dist/lenses/cylindrical.d.ts",
+      "import": "./dist/lenses/cylindrical.js"
+    },
+    "./spherical": {
+      "types": "./dist/lenses/spherical.d.ts",
+      "import": "./dist/lenses/spherical.js"
+    },
+    "./prism": {
+      "types": "./dist/lenses/prism.d.ts",
+      "import": "./dist/lenses/prism.js"
+    },
+    "./prismGrid": {
+      "types": "./dist/lenses/prismGrid.d.ts",
+      "import": "./dist/lenses/prismGrid.js"
+    },
+    "./random": {
+      "types": "./dist/lenses/random.d.ts",
+      "import": "./dist/lenses/random.js"
+    },
+    "./lensUtils": {
+      "types": "./dist/lensUtils.d.ts",
+      "import": "./dist/lensUtils.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "lens",
+    "filter",
+    "effect",
+    "liquid glass",
+    "glass",
+    "reading glass",
+    "cylindrical",
+    "spherical",
+    "prism",
+    "random filter",
+    "fisheye",
+    "kaleidoscope"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "tsdown": "^0.21.0-beta.2",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

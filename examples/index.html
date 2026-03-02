@@ -1,0 +1,758 @@
+<!-- 1000% AI -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@filter Lens Demo</title>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; }
+    .page {
+      position: relative;
+      min-height: 100%;
+      overflow: hidden;
+      background: url('https://monika.jkloli.net/image_bed/d033e22ae3-1760090985800-828dfa4a-38e1-4570-bec7-3af0bf30d9a1.png') center/cover no-repeat fixed;
+    }
+    .overlay-content {
+      position: relative;
+      padding: 48px;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      max-width: 960px;
+    }
+    .overlay-content h1 { margin: 0 0 8px; font-weight: 700; font-size: 42px; }
+    .overlay-content p { margin: 8px 0; max-width: 720px; line-height: 1.6; }
+    .toolbar {
+      position: fixed;
+      top: 12px; left: 12px; right: 12px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      backdrop-filter: blur(8px) saturate(1.2);
+      -webkit-backdrop-filter: blur(8px) saturate(1.2);
+      z-index: 9999;
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 8px; }
+    .toolbar select {
+      appearance: none; border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 8px; background: rgba(255,255,255,0.08);
+      color: #fff; padding: 8px 10px; font-size: 12px;
+    }
+    .toolbar button {
+      appearance: none; border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 8px; background: rgba(255,255,255,0.08);
+      color: #fff; padding: 8px 10px; cursor: pointer; font-size: 12px;
+    }
+    .toolbar button:hover { background: rgba(255,255,255,0.16); }
+    .toolbar .divider { width: 1px; height: 26px; background: rgba(255,255,255,0.25); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 8px; border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px; color: #fff; font-size: 12px;
+      background: rgba(255,255,255,0.08);
+    }
+    .pill button { padding: 2px 6px; font-size: 11px; }
+    .pill.active { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.6); }
+    .list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .panel {
+      position: fixed; top: 50%; left: 12px; transform: translateY(-50%);
+      width: 320px; max-height: calc(100vh - 80px);
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px; backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
+      z-index: 9998; overflow-y: auto; padding: 16px;
+      display: none; color: #fff;
+    }
+    .panel.show { display: block; }
+    .panel h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+    .control { margin-bottom: 14px; }
+    .control label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 6px; opacity: 0.9; }
+    .control input[type="range"] {
+      width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2);
+      outline: none; -webkit-appearance: none; appearance: none;
+    }
+    .control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; cursor: pointer; border: 2px solid rgba(0,0,0,0.3);
+    }
+    .control input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%; background: #fff;
+      cursor: pointer; border: 2px solid rgba(0,0,0,0.3);
+    }
+    .control select, .control input[type="number"] {
+      width: 100%; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px; background: rgba(255,255,255,0.1); color: #fff;
+      font-size: 12px; outline: none;
+    }
+    .panel {
+      z-index: 0;
+    }
+    .control .value { display: inline-block; margin-left: 8px; font-size: 11px; opacity: 0.8; }
+    .credit { position: fixed; right: 12px; bottom: 12px; color: rgba(255,255,255,0.9); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-group">
+        <select id="lensSelect">
+          <option value="glass">Glass</option>
+          <option value="fisheye">Fisheye</option>
+          <option value="kaleidoscope">Kaleidoscope</option>
+          <option value="readingGlass">ReadingGlass</option>
+          <option value="cylindrical">Cylindrical</option>
+          <option value="spherical">Spherical</option>
+          <option value="prism">Prism</option>
+          <option value="prismGrid">PrismGrid</option>
+          <option value="random">Random</option>
+        </select>
+        <button id="addBtn">Add Lens</button>
+      </div>
+      <div class="divider"></div>
+      <div class="toolbar-group list" id="lensList"></div>
+      <div style="margin-left:auto" class="toolbar-group">
+        <button id="clearBtn">Clear All</button>
+      </div>
+    </div>
+    <div class="overlay-content">
+      <h1>Lens Effects Demo</h1>
+      <p>Drag the lenses to explore the background. These elements use CSS backdrop-filter with dynamically generated SVG displacement maps to simulate optical effects like glass, fisheye, kaleidoscope, magnifier, prism and more.</p>
+      <p>Try adding multiple lenses and stacking them around the page. Toggle your browser's "Enable backdrop-filter" if needed.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="paramsPanel">
+    <h3 id="panelTitle">Select a lens to edit</h3>
+    <div id="paramsContainer"></div>
+  </div>
+
+  <div class="credit">Photo: Unsplash • Demo: @filter/lens</div>
+
+  <script type="module">
+    import {
+      Glass,
+      FisheyeLens,
+      KaleidoscopeLens,
+      ReadingGlass,
+      CylindricalLens,
+      SphericalLens,
+      PrismLens,
+      PrismGridLens,
+      RandomLens,
+    } from '../dist/index.js';
+
+    const toolbar = document.getElementById('toolbar');
+    const lensSelect = document.getElementById('lensSelect');
+    const addBtn = document.getElementById('addBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const lensList = document.getElementById('lensList');
+
+    function addButton(label, handler) {
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      btn.addEventListener('click', handler);
+      toolbar.appendChild(btn);
+    }
+
+    // Helpers to add lenses
+    function addGlass() {
+      const el = Glass.createDraggable({
+        width: 300,
+        height: 200,
+        radius: 18,
+        depth: 12,
+        strength: 110,
+        chromaticAberration: 6,
+        blur: 3,
+        initialX: 80,
+        initialY: 120,
+        className: 'lens-glass'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addFisheye() {
+      const el = FisheyeLens.createDraggable({
+        width: 220,
+        height: 220,
+        borderRadius: '50%',
+        distortion: 1.5,
+        edgeSoftness: 0.2,
+        chromaticAberration: 6,
+        blurAmount: 0,
+        initialX: 380,
+        initialY: 140,
+        className: 'lens-fisheye'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addKaleidoscope() {
+      const el = KaleidoscopeLens.createDraggable({
+        width: 260,
+        height: 260,
+        structure: 'triangular',
+        angle: 60,
+        segments: 6,
+        radialSegments: 5,
+        radialBlend: 0.72,
+        radialCurve: 0.6,
+        angularWarp: 0.28,
+        angularWarpFrequency: 5,
+        mirrorCurve: 1.6,
+        intensity: 1.35,
+        rotation: 0,
+        autoRotate: true,
+        rotationSpeed: 1,
+        initialX: 660,
+        initialY: 120,
+        className: 'lens-kaleidoscope'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addReadingGlass() {
+      const el = ReadingGlass.createDraggable({
+        width: 200,
+        height: 200,
+        borderRadius: '50%',
+        magnification: 1.6,
+        blurAmount: 1,
+        initialX: 150,
+        initialY: 380,
+        className: 'lens-reading'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addCylindrical() {
+      const el = CylindricalLens.createDraggable({
+        width: 280,
+        height: 160,
+        axis: 'horizontal',
+        curvature: 1.0,
+        initialX: 430,
+        initialY: 420,
+        className: 'lens-cylindrical'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addSpherical() {
+      const el = SphericalLens.createDraggable({
+        width: 220,
+        height: 220,
+        borderRadius: '50%',
+        curvature: 1.2,
+        chromaticAberration: 3,
+        initialX: 760,
+        initialY: 420,
+        className: 'lens-spherical'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addPrism() {
+      const el = PrismLens.createDraggable({
+        width: 260,
+        height: 180,
+        borderRadius: 0,
+        orientation: 25,
+        intensity: 0.5,
+        spread: 0.35,
+        banding: 0.4,
+        edgeSoftness: 0.15,
+        strength: 60,
+        dispersion: 28,
+        blurAmount: 0,
+        highlight: true,
+        autoRotate: false,
+        rotationSpeed: 0.6,
+        initialX: 1040,
+        initialY: 140,
+        className: 'lens-prism'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addPrismGrid() {
+      const el = PrismGridLens.createDraggable({
+        width: 260,
+        height: 180,
+        cellSize: 36,
+        dispersion: 10,
+        initialX: 1040,
+        initialY: 360,
+        className: 'lens-prism-grid'
+      });
+      document.body.appendChild(el);
+    }
+
+    function addRandom() {
+      const el = RandomLens.createDraggable({
+        width: 200,
+        height: 200,
+        intensity: 0.5,
+        grain: 4,
+        initialX: 1040,
+        initialY: 560,
+        className: 'lens-random'
+      });
+      document.body.appendChild(el);
+    }
+
+    // Lens manager (add/remove/list)
+    const lenses = [];
+    let counter = 0;
+    let selectedLensId = null;
+    const paramsPanel = document.getElementById('paramsPanel');
+    const paramsContainer = document.getElementById('paramsContainer');
+    const panelTitle = document.getElementById('panelTitle');
+
+    const creators = {
+      glass: (opts) => Glass.createDraggable(opts),
+      fisheye: (opts) => FisheyeLens.createDraggable(opts),
+      kaleidoscope: (opts) => KaleidoscopeLens.createDraggable(opts),
+      readingGlass: (opts) => ReadingGlass.createDraggable(opts),
+      cylindrical: (opts) => CylindricalLens.createDraggable(opts),
+      spherical: (opts) => SphericalLens.createDraggable(opts),
+      prism: (opts) => PrismLens.createDraggable(opts),
+      prismGrid: (opts) => PrismGridLens.createDraggable(opts),
+      random: (opts) => RandomLens.createDraggable(opts),
+    };
+
+    const defaults = {
+      glass: { width: 300, height: 200, radius: 18, depth: 12, strength: 110, chromaticAberration: 6, blur: 3, debug: false },
+      fisheye: { width: 220, height: 220, borderRadius: 110, distortion: 1.5, edgeSoftness: 0.2, chromaticAberration: 6, blurAmount: 0, debug: false },
+      kaleidoscope: {
+        width: 260,
+        height: 260,
+        borderRadius: 0,
+        structure: 'triangular',
+        angle: 60,
+        segments: 6,
+        radialSegments: 5,
+        radialBlend: 0.72,
+        radialCurve: 0.6,
+        angularWarp: 0.28,
+        angularWarpFrequency: 5,
+        mirrorCurve: 1.6,
+        intensity: 1.35,
+        fourMirrorLayout: 'square',
+        fourMirrorFocus: 0.22,
+        fourMirrorTwist: 0.35,
+        fourMirrorWarp: 0.3,
+        loopFocus: 0.4,
+        rotation: 0,
+        autoRotate: true,
+        rotationSpeed: 1,
+        chromaticAberration: 3,
+        edgeSoftness: 0.2,
+        debug: false,
+      },
+      readingGlass: { width: 200, height: 200, borderRadius: 100, magnification: 1.6, blurAmount: 1, edgeSoftness: 0.25, debug: false },
+      cylindrical: { width: 280, height: 160, borderRadius: 0, axis: 'horizontal', curvature: 1.0, edgeSoftness: 0.2, debug: false },
+      spherical: { width: 220, height: 220, borderRadius: 110, curvature: 1.2, chromaticAberration: 3, edgeSoftness: 0.25, debug: false },
+      prism: {
+        width: 260,
+        height: 180,
+        borderRadius: 0,
+        orientation: 25,
+        intensity: 0.5,
+        spread: 0.35,
+        banding: 0.4,
+        edgeSoftness: 0.15,
+        strength: 60,
+        dispersion: 28,
+        blurAmount: 0,
+        highlight: true,
+        autoRotate: false,
+        rotationSpeed: 0.6,
+        debug: false,
+      },
+      prismGrid: { width: 260, height: 180, borderRadius: 0, cellSize: 36, dispersion: 10, debug: false },
+      random: { width: 200, height: 200, borderRadius: 0, intensity: 0.5, grain: 4, debug: false },
+    };
+
+    function getLensOptions(lens) {
+      return lens.options || {};
+    }
+
+    function uid() { return `L${++counter}`; }
+
+    function place(element, x, y) {
+      element.style.left = `${x}px`;
+      element.style.top = `${y}px`;
+      document.body.appendChild(element);
+    }
+
+    function renderList() {
+      lensList.innerHTML = '';
+      for (const item of lenses) {
+        const pill = document.createElement('div');
+        pill.className = `pill ${selectedLensId === item.id ? 'active' : ''}`;
+        pill.innerHTML = `<span>${item.type}</span>`;
+        const rm = document.createElement('button');
+        rm.textContent = 'Remove';
+        rm.addEventListener('click', (e) => { e.stopPropagation(); removeLens(item.id); });
+        pill.appendChild(rm);
+        pill.addEventListener('click', () => selectLens(item.id));
+        lensList.appendChild(pill);
+      }
+    }
+
+    function addLensByType(type) {
+      const id = uid();
+      const base = { ...defaults[type] } || {};
+      const x = 80 + (lenses.length % 6) * 120;
+      const y = 120 + Math.floor(lenses.length / 6) * 140;
+      const options = { ...base, initialX: x, initialY: y, className: `lens-${type}` };
+      const element = creators[type](options);
+      if (!element.dataset) { element.dataset = {}; }
+      element.dataset.lensId = id;
+      lenses.push({ id, type, element, options });
+      place(element, x, y);
+      renderList();
+      selectLens(id);
+    }
+
+    function removeLens(id) {
+      const idx = lenses.findIndex(l => l.id === id);
+      if (idx === -1) return;
+      const [item] = lenses.splice(idx, 1);
+      if (item.element && item.element._cleanup) item.element._cleanup();
+      if (item.element && item.element.remove) item.element.remove();
+      if (selectedLensId === id) {
+        selectedLensId = null;
+        paramsPanel.classList.remove('show');
+        panelTitle.textContent = 'Select a lens to edit';
+        paramsContainer.innerHTML = '';
+      }
+      renderList();
+    }
+
+    function selectLens(id) {
+      selectedLensId = id;
+      renderList();
+      const lens = lenses.find(l => l.id === id);
+      if (lens) {
+        renderParams(lens);
+        paramsPanel.classList.add('show');
+      }
+    }
+
+    function updateLens(lens) {
+      if (!lens || !lens.element) return;
+      const oldX = lens.element.offsetLeft || 0;
+      const oldY = lens.element.offsetTop || 0;
+      const className = lens.element.className;
+      if (lens.element._cleanup) lens.element._cleanup();
+      lens.element.remove();
+      const newOpts = { ...lens.options, initialX: oldX, initialY: oldY, className };
+      lens.element = creators[lens.type](newOpts);
+      lens.element.dataset.lensId = lens.id;
+      lens.element.className = className;
+      place(lens.element, oldX, oldY);
+    }
+
+    function addControl(label, key, type, value, min, max, step, lens, options = {}) {
+      const control = document.createElement('div');
+      control.className = 'control';
+      const labelEl = document.createElement('label');
+      const valueFormatter = options.format || (v => v);
+      const id = `param_${lens.id}_${key}`;
+
+      if (type === 'range') {
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.textContent = valueFormatter(value);
+        labelEl.textContent = label;
+        labelEl.appendChild(valueSpan);
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.id = id;
+        input.min = min;
+        input.max = max;
+        input.step = step;
+        input.value = value;
+        input.addEventListener('input', () => {
+          const newValue = parseFloat(input.value);
+          lens.options[key] = newValue;
+          valueSpan.textContent = valueFormatter(newValue);
+          updateLens(lens);
+        });
+        control.appendChild(labelEl);
+        control.appendChild(input);
+      } else if (type === 'select') {
+        labelEl.htmlFor = id;
+        labelEl.textContent = label;
+        const select = document.createElement('select');
+        select.id = id;
+        options.options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          option.selected = opt === value;
+          select.appendChild(option);
+        });
+        select.addEventListener('change', () => {
+          lens.options[key] = select.value;
+          updateLens(lens);
+          if (options.onChange) options.onChange(select.value);
+        });
+        control.appendChild(labelEl);
+        control.appendChild(select);
+      } else if (type === 'number') {
+        labelEl.htmlFor = id;
+        labelEl.textContent = label;
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = id;
+        input.min = min;
+        input.max = max;
+        input.step = step;
+        input.value = value;
+        input.addEventListener('input', () => {
+          const newValue = parseFloat(input.value);
+          lens.options[key] = newValue;
+          updateLens(lens);
+        });
+        control.appendChild(labelEl);
+        control.appendChild(input);
+      } else if (type === 'checkbox') {
+        labelEl.textContent = label;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = id;
+        checkbox.checked = Boolean(value);
+        checkbox.addEventListener('change', () => {
+          lens.options[key] = checkbox.checked;
+          updateLens(lens);
+        });
+        labelEl.appendChild(checkbox);
+        control.appendChild(labelEl);
+      }
+      return control;
+    }
+
+    function renderParams(lens) {
+      paramsContainer.innerHTML = '';
+      panelTitle.textContent = `Edit ${lens.type}`;
+
+      const ensureValue = (key, defaultValue) => {
+        if (lens.options[key] === undefined || lens.options[key] === null) {
+          lens.options[key] = defaultValue;
+        }
+        return lens.options[key];
+      };
+
+      const ensureNumber = (key, defaultValue) => {
+        const value = lens.options[key];
+        const numeric = Number(value);
+        if (Number.isFinite(numeric)) {
+          lens.options[key] = numeric;
+          return numeric;
+        }
+        lens.options[key] = defaultValue;
+        return defaultValue;
+      };
+
+      const ensureBool = (key, defaultValue) => {
+        if (typeof lens.options[key] !== 'boolean') {
+          lens.options[key] = Boolean(defaultValue);
+        }
+        return lens.options[key];
+      };
+
+      const formatPx = (v) => `${Math.round(Number(v) || 0)}px`;
+      const formatDeg = (v) => `${Math.round(Number(v) || 0)}°`;
+      const formatFloat2 = (v) => Number(v).toFixed(2);
+      const formatMagnification = (v) => `${Number(v).toFixed(1)}x`;
+
+      const addRangeParam = (label, key, def, min, max, step, format = (v) => v) => {
+        const value = ensureNumber(key, def);
+        paramsContainer.appendChild(addControl(label, key, 'range', value, min, max, step, lens, { format }));
+      };
+
+      const addSelectParam = (label, key, def, optionsList, extra = {}) => {
+        const value = ensureValue(key, def);
+        paramsContainer.appendChild(addControl(label, key, 'select', value, null, null, null, lens, { options: optionsList, ...extra }));
+      };
+
+      const addCheckboxParam = (label, key, def) => {
+        const value = ensureBool(key, def);
+        paramsContainer.appendChild(addControl(label, key, 'checkbox', value, null, null, null, lens));
+      };
+
+      switch (lens.type) {
+        case 'glass':
+          addRangeParam('Width', 'width', 300, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 200, 100, 600, 10, formatPx);
+          addRangeParam('Radius', 'radius', 18, 0, 500, 5, formatPx);
+          addRangeParam('Depth', 'depth', 12, 1, 30, 1);
+          addRangeParam('Strength', 'strength', 110, 0, 200, 10);
+          addRangeParam('Chromatic Aberration', 'chromaticAberration', 6, 0, 20, 1);
+          addRangeParam('Blur', 'blur', 3, 0, 20, 1);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'fisheye':
+          addRangeParam('Width', 'width', 220, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 220, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 110, 0, 500, 5, formatPx);
+          addRangeParam('Distortion', 'distortion', 1.5, 0.5, 3, 0.1, formatFloat2);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.2, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Chromatic Aberration', 'chromaticAberration', 6, 0, 20, 1);
+          addRangeParam('Blur', 'blurAmount', 0, 0, 10, 0.5, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'kaleidoscope': {
+          addRangeParam('Width', 'width', 260, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 260, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 0, 0, 500, 5, formatPx);
+          const structure = ensureValue('structure', 'triangular');
+          addSelectParam('Structure', 'structure', structure, ['triangular', 'two-mirror', 'four-mirror', 'conical', 'loop'], {
+            onChange: () => setTimeout(() => renderParams(lens), 50),
+          });
+
+          if (structure === 'triangular' || structure === 'two-mirror') {
+            addRangeParam('Angle', 'angle', 60, 20, 120, 1, formatDeg);
+            addRangeParam('Segments', 'segments', structure === 'triangular' ? 6 : 4, structure === 'triangular' ? 3 : 2, 32, 1, (v) => Math.round(v));
+            addRangeParam('Radial Segments', 'radialSegments', structure === 'triangular' ? 5 : 3, 1, 12, 1, (v) => Math.round(v));
+            addRangeParam('Radial Blend', 'radialBlend', structure === 'triangular' ? 0.72 : 0.58, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Radial Curve', 'radialCurve', structure === 'triangular' ? 0.6 : 0.45, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Angular Warp', 'angularWarp', structure === 'triangular' ? 0.28 : 0.18, 0, 0.8, 0.02, formatFloat2);
+            addRangeParam('Angular Warp Frequency', 'angularWarpFrequency', structure === 'triangular' ? 5 : 3, 0, 12, 0.25, formatFloat2);
+            addRangeParam('Mirror Curve', 'mirrorCurve', structure === 'triangular' ? 1.6 : 1.35, 0.3, 3, 0.05, formatFloat2);
+          } else if (structure === 'four-mirror') {
+            const layout = ensureValue('fourMirrorLayout', 'square');
+            addSelectParam('Layout', 'fourMirrorLayout', layout, ['square', 'diamond'], {
+              onChange: () => setTimeout(() => renderParams(lens), 50),
+            });
+            addRangeParam('Radial Segments', 'radialSegments', 4, 1, 12, 1, (v) => Math.round(v));
+            addRangeParam('Radial Blend', 'radialBlend', 0.65, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Radial Curve', 'radialCurve', 0.5, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Focus Shift', 'fourMirrorFocus', layout === 'diamond' ? 0.28 : 0.2, 0, 0.6, 0.02, formatFloat2);
+            addRangeParam('Facet Twist', 'fourMirrorTwist', 0.35, -1, 1, 0.02, formatFloat2);
+            addRangeParam('Facet Warp', 'fourMirrorWarp', 0.3, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Mirror Curve', 'mirrorCurve', 1.4, 0.3, 3, 0.05, formatFloat2);
+          } else if (structure === 'conical') {
+            addRangeParam('Mirror Count', 'conicalMirrors', 3, 3, 8, 1, (v) => Math.round(v));
+            addRangeParam('Curve', 'conicalCurve', 0.4, 0, 1, 0.05, formatFloat2);
+          } else if (structure === 'loop') {
+            addRangeParam('Tunnel Depth', 'tunnelDepth', 0.35, 0, 1, 0.05, formatFloat2);
+            addRangeParam('Tunnel Twist', 'tunnelTwist', 1.0, 0, 3, 0.1, formatFloat2);
+            addRangeParam('Loop Focus', 'loopFocus', 0.4, 0.1, 2.5, 0.05, formatFloat2);
+          }
+
+          addRangeParam('Rotation', 'rotation', 0, 0, 360, 1, formatDeg);
+          addRangeParam('Rotation Speed', 'rotationSpeed', 1, 0.5, 5, 0.5, formatFloat2);
+          addCheckboxParam('Auto Rotate', 'autoRotate', true);
+
+          const intensityDefault =
+            structure === 'triangular'
+              ? 1.35
+              : structure === 'two-mirror'
+              ? 1.15
+              : structure === 'four-mirror'
+              ? 1.25
+              : structure === 'conical'
+              ? 1.1
+              : structure === 'loop'
+              ? 1.05
+              : 1;
+          addRangeParam('Intensity', 'intensity', intensityDefault, 0.2, 3, 0.05, formatFloat2);
+          addRangeParam('Chromatic Aberration', 'chromaticAberration', 3, 0, 15, 1);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.2, 0, 1, 0.05, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        }
+        case 'readingGlass':
+          addRangeParam('Width', 'width', 200, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 200, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 100, 0, 500, 5, formatPx);
+          addRangeParam('Magnification', 'magnification', 1.6, 1, 3, 0.1, formatMagnification);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.25, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Blur', 'blurAmount', 1, 0, 10, 0.5, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'cylindrical':
+          addRangeParam('Width', 'width', 280, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 160, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 0, 0, 500, 5, formatPx);
+          addSelectParam('Axis', 'axis', 'horizontal', ['horizontal', 'vertical']);
+          addRangeParam('Curvature', 'curvature', 1.0, 0, 2, 0.1, formatFloat2);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.2, 0, 1, 0.05, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'spherical':
+          addRangeParam('Width', 'width', 220, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 220, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 110, 0, 500, 5, formatPx);
+          addRangeParam('Curvature', 'curvature', 1.2, 0, 2, 0.1, formatFloat2);
+          addRangeParam('Chromatic Aberration', 'chromaticAberration', 3, 0, 15, 1);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.25, 0, 1, 0.05, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'prism':
+          addRangeParam('Width', 'width', 260, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 180, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 0, 0, 500, 5, formatPx);
+          addRangeParam('Orientation', 'orientation', 25, 0, 360, 1, formatDeg);
+          addRangeParam('Intensity', 'intensity', 0.5, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Spread', 'spread', 0.35, 0.05, 1, 0.05, formatFloat2);
+          addRangeParam('Banding', 'banding', 0.4, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Edge Softness', 'edgeSoftness', 0.15, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Strength', 'strength', 60, 0, 200, 5);
+          addRangeParam('Dispersion', 'dispersion', 28, 0, 60, 1);
+          addRangeParam('Blur', 'blurAmount', 0, 0, 10, 0.5, formatFloat2);
+          addCheckboxParam('Highlight', 'highlight', true);
+          addCheckboxParam('Auto Rotate', 'autoRotate', false);
+          addRangeParam('Rotation Speed', 'rotationSpeed', 0.6, 0, 5, 0.1, formatFloat2);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'prismGrid':
+          addRangeParam('Width', 'width', 260, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 180, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 0, 0, 500, 5, formatPx);
+          addRangeParam('Cell Size', 'cellSize', 36, 8, 200, 4, formatPx);
+          addRangeParam('Dispersion', 'dispersion', 10, 0, 30, 1);
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        case 'random':
+          addRangeParam('Width', 'width', 200, 100, 600, 10, formatPx);
+          addRangeParam('Height', 'height', 200, 100, 600, 10, formatPx);
+          addRangeParam('Border Radius', 'borderRadius', 0, 0, 500, 5, formatPx);
+          addRangeParam('Intensity', 'intensity', 0.5, 0, 1, 0.05, formatFloat2);
+          addRangeParam('Grain', 'grain', 4, 1, 20, 1, (v) => Math.round(v));
+          addCheckboxParam('Debug Mode', 'debug', false);
+          break;
+        default:
+          paramsContainer.innerHTML = '<div style="font-size:12px; opacity:0.8;">No controls available for this lens.</div>';
+          break;
+      }
+    }
+
+    addBtn.addEventListener('click', () => addLensByType(/** @type {HTMLSelectElement} */(lensSelect).value));
+    clearBtn.addEventListener('click', () => {
+      while (lenses.length) {
+        removeLens(lenses[0].id);
+      }
+      selectedLensId = null;
+      paramsPanel.classList.remove('show');
+      panelTitle.textContent = 'Select a lens to edit';
+      paramsContainer.innerHTML = '';
+    });
+
+    // Defaults on load
+    addLensByType('glass');
+    setTimeout(() => {
+      addLensByType('fisheye');
+      setTimeout(() => addLensByType('kaleidoscope'), 100);
+    }, 100);
+  </script>
+</body>
+</html>
+
+
